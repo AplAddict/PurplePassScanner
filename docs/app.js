@@ -7,10 +7,22 @@ var app = new Vue({
     scans: []
   },
   mounted: function () {
+    let key = prompt('Enter your hook export key:','')
     var self = this;
     self.scanner = new Instascan.Scanner({ video: document.getElementById('preview'), scanPeriod: 5 });
     self.scanner.addListener('scan', function (content, image) {
       self.scans.unshift({ date: +(Date.now()), content: content });
+      const d = new Date();
+      let text = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      fetch("https://hook.us1.make.com/" + key, {
+        method: "POST",
+        body: JSON.stringify({
+          Note: content + ": " + text
+        }),
+        headers: {
+          "Content-type": "application/json; charset=UTF-8"
+        }
+      });
     });
     Instascan.Camera.getCameras().then(function (cameras) {
       self.cameras = cameras;
